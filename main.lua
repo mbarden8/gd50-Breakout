@@ -66,7 +66,8 @@ function love.load()
         ['paddles'] = GenerateQuadsPaddles(gTextures['main']),
         ['balls'] = GenerateQuadsBalls(gTextures['main']),
         ['bricks'] = GenerateQuadsBricks(gTextures['main']),
-        ['hearts'] = GenerateQuads(gTextures['hearts'], 10, 9)
+        ['hearts'] = GenerateQuads(gTextures['hearts'], 10, 9),
+        ['powerups'] = GenerateQuadsPowerups(gTextures['main'])
     }
     
     -- initialize our virtual resolution, which will be rendered within our
@@ -293,6 +294,14 @@ function displayFPS()
     love.graphics.print('FPS: ' .. tostring(love.timer.getFPS()), 5, 5)
 end
 
+--[[
+    Renders the select pause information
+]]
+function displayPause()
+    love.graphics.setFont(gFonts['small'])
+    love.graphics.setColor(255, 255, 255, 255)
+    love.graphics.print('Press "SPACE" to pause the game', 45, 5)
+end
 --[[
     Simply renders the player's score at the top right, with left-side padding
     for the score number.

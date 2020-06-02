@@ -29,6 +29,9 @@ function PlayState:enter(params)
     self.ball = params.ball
     self.level = params.level
 
+    self.powerups = {}
+    self.timer = 0
+
     self.recoverPoints = 5000
 
     -- give ball random starting velocity
@@ -50,9 +53,21 @@ function PlayState:update(dt)
         return
     end
 
+    -- spawning the powerup
+    self.timer = self.timer + dt
+    local spawn_time = 5
+    if self.timer > spawn_time then
+        table.insert(self.powerups, Powerup(9))
+        -- reset timer
+        self.timer = 0
+    end
+
     -- update positions based on velocity
     self.paddle:update(dt)
     self.ball:update(dt)
+    for k, powerup in pairs(self.powerups) do
+        powerup:update(dt)
+    end
 
     if self.ball:collides(self.paddle) then
         -- raise ball above paddle in case it goes below it, then reverse dy
@@ -73,6 +88,13 @@ function PlayState:update(dt)
         end
 
         gSounds['paddle-hit']:play()
+    end
+
+    --  detect collision for the powerups with the paddle
+    for k, powerup in pairs(self.powerups) do
+        if powerup:collides(self.paddle) then
+            table.remove(self.powerups, k)
+        end
     end
 
     -- detect collision across all bricks with the ball
@@ -208,16 +230,26 @@ function PlayState:render()
         brick:renderParticles()
     end
 
+    -- render powerups
+    for k, powerup in pairs(self.powerups) do
+        powerup:render()
+    end
+
     self.paddle:render()
     self.ball:render()
 
     renderScore(self.score)
     renderHealth(self.health)
+    if not self.paused then
+        displayPause()
+    end
 
     -- pause text, if paused
     if self.paused then
         love.graphics.setFont(gFonts['large'])
         love.graphics.printf("PAUSED", 0, VIRTUAL_HEIGHT / 2 - 16, VIRTUAL_WIDTH, 'center')
+        love.graphics.setFont(gFonts['medium'])
+        love.graphics.printf('Press "SPACE" to resume', 0, VIRTUAL_HEIGHT / 2 + 16, VIRTUAL_WIDTH, 'center')
     end
 end
 
