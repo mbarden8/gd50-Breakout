@@ -32,6 +32,10 @@ function PlayState:enter(params)
     self.powerups = {}
     self.timer = 0
 
+    self.balls = {
+        self.ball
+    }
+
     self.recoverPoints = 5000
 
     -- give ball random starting velocity
@@ -53,21 +57,10 @@ function PlayState:update(dt)
         return
     end
 
-    -- spawning the powerup
-    self.timer = self.timer + dt
-    local spawn_time = 5
-    if self.timer > spawn_time then
-        table.insert(self.powerups, Powerup(9))
-        -- reset timer
-        self.timer = 0
-    end
 
     -- update positions based on velocity
     self.paddle:update(dt)
     self.ball:update(dt)
-    for k, powerup in pairs(self.powerups) do
-        powerup:update(dt)
-    end
 
     if self.ball:collides(self.paddle) then
         -- raise ball above paddle in case it goes below it, then reverse dy
@@ -90,13 +83,6 @@ function PlayState:update(dt)
         gSounds['paddle-hit']:play()
     end
 
-    --  detect collision for the powerups with the paddle
-    for k, powerup in pairs(self.powerups) do
-        if powerup:collides(self.paddle) then
-            table.remove(self.powerups, k)
-        end
-    end
-
     -- detect collision across all bricks with the ball
     for k, brick in pairs(self.bricks) do
 
@@ -116,6 +102,9 @@ function PlayState:update(dt)
 
                 -- multiply recover points by 2
                 self.recoverPoints = math.min(100000, self.recoverPoints * 2)
+
+                -- increase paddle size; can't go above 3
+                self.paddle.size = math.min(self.paddle.size + 1, 3)
 
                 -- play recover sound effect
                 gSounds['recover']:play()
@@ -190,6 +179,9 @@ function PlayState:update(dt)
     if self.ball.y >= VIRTUAL_HEIGHT then
         self.health = self.health - 1
         gSounds['hurt']:play()
+        if self.paddle.size >= 1 then
+            self.paddle.size = self.paddle.size - 1
+        end
 
         if self.health == 0 then
             gStateMachine:change('game-over', {
@@ -217,6 +209,30 @@ function PlayState:update(dt)
     if love.keyboard.wasPressed('escape') then
         love.event.quit()
     end
+
+    -- spawning the powerup
+    self.timer = self.timer + dt
+    local spawn_time = 5
+    if self.timer > spawn_time then
+        table.insert(self.powerups, Powerup(9))
+        -- reset timer
+        self.timer = 0
+    end
+
+    -- do the update for the powerups
+    for k, powerup in pairs(self.powerups) do
+        powerup:update(dt)
+        if powerup:collides(self.paddle) then
+            gSounds['paddle-hit']:play()
+            table.remove(self.powerups, k)
+            table.insert(self.balls, Ball(self.ball.skin, self.balls[1].x, self.balls[1].y))
+            table.insert(self.balls, Ball(self.ball.skin, self.balls[1].x, self.balls[1].y))
+        end
+
+        if powerup.y > VIRTUAL_HEIGHT + 16 then
+            table.remove(self.powerups, k)
+        end
+    end
 end
 
 function PlayState:render()
@@ -233,6 +249,11 @@ function PlayState:render()
     -- render powerups
     for k, powerup in pairs(self.powerups) do
         powerup:render()
+    end
+
+    -- render extra balls if there are any
+    for k, ball in pairs(self.balls) do
+        ball:render()
     end
 
     self.paddle:render()

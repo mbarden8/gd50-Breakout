@@ -26,8 +26,8 @@ function Powerup:init(skin)
     self.dx = 15
 
     -- where the powerup will spawn
-    self.x = VIRTUAL_WIDTH / 2 - 2
-    self.y = VIRTUAL_HEIGHT / 2 - 15
+    self.x = math.random(0, VIRTUAL_WIDTH - 10)
+    self.y = 0
 
     -- this will be the skin of our powerup which is indexed from 
     -- our table of quads
