@@ -23,7 +23,7 @@ function Powerup:init(skin)
 
     -- keep track of our x and y velocities
     self.dy = 50
-    self.dx = 15
+    self.dx = 0
 
     -- where the powerup will spawn
     self.x = math.random(0, VIRTUAL_WIDTH - 10)
