@@ -87,7 +87,7 @@ end
     Will tell if a brick is a locked brick or not
 ]]
 function Brick:getLock()
-    local random_num = math.random(1, 2)
+    local random_num = math.random(1, 44)
     if random_num == 2 then
         self.locked = true
     end

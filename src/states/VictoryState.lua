@@ -21,6 +21,7 @@ function VictoryState:enter(params)
     self.health = params.health
     self.ball = params.ball
     self.recoverPoints = params.recoverPoints
+    self.keys = params.keys
 end
 
 function VictoryState:update(dt)
@@ -39,7 +40,8 @@ function VictoryState:update(dt)
             health = self.health,
             score = self.score,
             highScores = self.highScores,
-            recoverPoints = self.recoverPoints
+            recoverPoints = self.recoverPoints,
+            keys = self.keys
         })
     end
 end
@@ -50,6 +52,7 @@ function VictoryState:render()
 
     renderHealth(self.health)
     renderScore(self.score)
+    renderKeys(self.keys)
 
     -- level complete text
     love.graphics.setFont(gFonts['large'])
