@@ -82,6 +82,17 @@ function Powerup:update(dt)
 end
 
 --[[
+    Return what type of powerup we have
+]]
+function Powerup:powerType()
+    if self.skin == 9 then
+        return "two_balls"
+    elseif self.skin == 10 then
+        return "key"
+    end
+end
+
+--[[
     Render the powerup on screen
 ]]
 function Powerup:render()

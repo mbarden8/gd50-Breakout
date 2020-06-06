@@ -28,13 +28,15 @@ function PlayState:enter(params)
     self.highScores = params.highScores
     self.ball = params.ball
     self.level = params.level
+    self.keys = params.keys
 
     self.powerups = {}
-    self.timer = 0
-
     self.balls = {
         self.ball
     }
+
+    self.ballTimer = 0
+    self.keyTimer = 0
 
     self.recoverPoints = 5000
 
@@ -198,7 +200,8 @@ function PlayState:update(dt)
                     score = self.score,
                     highScores = self.highScores,
                     level = self.level,
-                    recoverPoints = self.recoverPoints
+                    recoverPoints = self.recoverPoints,
+                    keys = self.keys
                 })
         
                 if self.paddle.size >= 1 then
@@ -225,26 +228,44 @@ function PlayState:update(dt)
         love.event.quit()
     end
 
-    -- spawning the powerup
-    self.timer = self.timer + dt
-    local spawn_time = math.random(5, 20)
-    if self.timer > spawn_time then
+    -- spawning the ball powerup
+    self.ballTimer = self.ballTimer + dt
+    local ball_spawn = math.random(5, 20)
+    if self.ballTimer > ball_spawn then
         table.insert(self.powerups, Powerup(9))
         -- reset timer
-        self.timer = 0
+        self.ballTimer = 0
+    end
+
+    -- spawning the key powerup
+    self.keyTimer = self.keyTimer + dt
+    local key_spawn = math.random(5, 20)
+    if self.keys < 3 and self.keyTimer > key_spawn then
+        table.insert(self.powerups, Powerup(10))
+        self.keyTimer = 0
     end
 
     -- do the update for the powerups
     for k, powerup in pairs(self.powerups) do
         powerup:update(dt)
         if powerup:collides(self.paddle) then
-            gSounds['paddle-hit']:play()
-            table.remove(self.powerups, k)
-            table.insert(self.balls, Ball(math.random(7), self.paddle.x + (self.paddle.width / 2) - 4, 
-             self.paddle.y - 8, math.random(-200, 200), math.random(-50, -60)))
+            if powerup:powerType() == "two_balls" then
+                gSounds['paddle-hit']:play()
+                gSounds['ball-powerup']:play()
+                table.remove(self.powerups, k)
+                table.insert(self.balls, Ball(math.random(7), self.paddle.x + (self.paddle.width / 2) - 4, 
+                 self.paddle.y - 8, math.random(-200, 200), math.random(-50, -60)))
+                table.insert(self.balls, Ball(math.random(7), self.paddle.x + (self.paddle.width / 2) - 4, 
+                 self.paddle.y - 8, math.random(-200, 200), math.random(-50, -60)))
 
-            table.insert(self.balls, Ball(math.random(7), self.paddle.x + (self.paddle.width / 2) - 4, 
-             self.paddle.y - 8, math.random(-200, 200), math.random(-50, -60)))
+            elseif powerup:powerType() == "key" then
+                gSounds['paddle-hit']:play()
+                table.remove(self.powerups, k)
+                if self.keys < 3 then
+                    self.keys = self.keys + 1
+                    gSounds['key-pickup']:play()
+                end
+            end
         end
 
         if powerup.y > VIRTUAL_HEIGHT + 16 then
@@ -278,6 +299,7 @@ function PlayState:render()
 
     renderScore(self.score)
     renderHealth(self.health)
+    renderKeys(self.keys)
     if not self.paused then
         displayPause()
     end

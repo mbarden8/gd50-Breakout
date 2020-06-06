@@ -94,6 +94,8 @@ function love.load()
         ['recover'] = love.audio.newSource('sounds/recover.wav'),
         ['high-score'] = love.audio.newSource('sounds/high_score.wav'),
         ['pause'] = love.audio.newSource('sounds/pause.wav'),
+        ['key-pickup'] = love.audio.newSource('sounds/key_pickup.wav'),
+        ['ball-powerup'] = love.audio.newSource('sounds/ball_powerup.wav'),
 
         ['music'] = love.audio.newSource('sounds/music.wav')
     }
@@ -282,6 +284,20 @@ function renderHealth(health)
         love.graphics.draw(gTextures['hearts'], gFrames['hearts'][2], healthX, 4)
         healthX = healthX + 11
     end
+end
+
+--[[
+    Render the number of key powerups the player currently has
+]]
+function renderKeys(keys)
+    -- start of our keys rendering
+    local keysX = VIRTUAL_WIDTH - 150
+
+    -- render key icon
+    love.graphics.draw(gTextures['main'], gFrames['powerups'][10], keysX, 0)
+    love.graphics.setFont(gFonts['small'])
+    love.graphics.setColor(255, 255, 255, 255)
+    love.graphics.print('x' .. tostring(keys), keysX + 20, 4)
 end
 
 --[[
