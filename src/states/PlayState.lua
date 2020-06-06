@@ -95,6 +95,7 @@ function PlayState:update(dt)
             -- only check collision if we're in play
             if brick.inPlay and ball:collides(brick) then
 
+
                 -- add to score
                 self.score = self.score + (brick.tier * 200 + brick.color * 25)
 
@@ -146,29 +147,29 @@ function PlayState:update(dt)
                 -- left edge; only check if we're moving right, and offset the check by a couple of pixels
                 -- so that flush corner hits register as Y flips, not X flips
                 if ball.x + 2 < brick.x and ball.dx > 0 then
-                    
+
                     -- flip x velocity and reset position outside of brick
                     ball.dx = -ball.dx
                     ball.x = brick.x - 8
-                
+                    
                 -- right edge; only check if we're moving left, , and offset the check by a couple of pixels
                 -- so that flush corner hits register as Y flips, not X flips
                 elseif ball.x + 6 > brick.x + brick.width and ball.dx < 0 then
-                    
+                        
                     -- flip x velocity and reset position outside of brick
                     ball.dx = -ball.dx
                     ball.x = brick.x + 32
-                
+                    
                 -- top edge if no X collisions, always check
                 elseif ball.y < brick.y then
-                    
+                        
                     -- flip y velocity and reset position outside of brick
                     ball.dy = -ball.dy
                     ball.y = brick.y - 8
-                
+                    
                 -- bottom edge if no X collisions or top collision, last possibility
                 else
-                    
+                        
                     -- flip y velocity and reset position outside of brick
                     ball.dy = -ball.dy
                     ball.y = brick.y + 16

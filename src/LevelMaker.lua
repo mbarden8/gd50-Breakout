@@ -95,6 +95,10 @@ function LevelMaker.createMap(level)
                 y * 16                  -- just use y * 16, since we need top padding anyway
             )
 
+            if b:getLock() then
+                table.insert(bricks, b)
+                goto continue
+            end
             -- if we're alternating, figure out which color/tier we're on
             if alternatePattern and alternateFlag then
                 b.color = alternateColor1
