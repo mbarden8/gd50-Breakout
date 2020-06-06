@@ -41,8 +41,8 @@ function PlayState:enter(params)
     self.recoverPoints = 5000
 
     -- give ball random starting velocity
-    self.balls[1].dx = math.random(-200, 200)
-    self.balls[1].dy = math.random(-50, -60)
+    self.ball.dx = math.random(-200, 200)
+    self.ball.dy = math.random(-50, -60)
 end
 
 function PlayState:update(dt)
@@ -96,7 +96,13 @@ function PlayState:update(dt)
             if brick.inPlay and ball:collides(brick) then
 
                 -- add to score
-                self.score = self.score + (brick.tier * 200 + brick.color * 25)
+                if brick.locked and self.keys > 0 then
+                    self.score = self.score + 1500
+                elseif brick.locked and self.keys == 0 then
+                    ::continue::
+                else
+                    self.score = self.score + (brick.tier * 200 + brick.color * 25)
+                end
 
                 -- trigger the brick's hit function, which removes it from play
                 if brick.locked and self.keys == 0 then
@@ -136,7 +142,7 @@ function PlayState:update(dt)
                         health = self.health,
                         score = self.score,
                         highScores = self.highScores,
-                        ball = self.balls[1],
+                        ball = self.ball,
                         recoverPoints = self.recoverPoints,
                         keys = 0
                     })
@@ -247,7 +253,7 @@ function PlayState:update(dt)
 
     -- spawning the key powerup
     self.keyTimer = self.keyTimer + dt
-    local key_spawn = math.random(5, 20)
+    local key_spawn = math.random(20, 35)
     if self.keys < 3 and self.keyTimer > key_spawn then
         table.insert(self.powerups, Powerup(10))
         self.keyTimer = 0
